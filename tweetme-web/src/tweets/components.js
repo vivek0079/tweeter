@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {loadTweets} from '../lookup';
+import {loadTweets, createTweet} from '../lookup';
 
 export function TweetsComponent(props) {
 	const textAreaRef = React.createRef();
@@ -8,11 +8,14 @@ export function TweetsComponent(props) {
 		event.preventDefault();
 		const newValue = textAreaRef.current.value;
 		let currentTweetList = [...newTweet];
-		currentTweetList.unshift({
-			content: newValue,
-			likes: 0,
-			id: 123,
+		createTweet(newValue, (response, status) => {
+			if (status === 201) {
+				currentTweetList.unshift(response);
+			} else {
+				console.log(response);
+			}
 		});
+
 		setNewTweet(currentTweetList);
 		textAreaRef.current.value = '';
 	};
@@ -30,6 +33,7 @@ export function TweetsComponent(props) {
 export function TweetsList(props) {
     const [tweetsInit, setTweetsInit] = useState([]);
     const [tweets, setTweets] = useState([]);
+    const [tweetsDidSet, setTweetsDidSet] = useState(false);
     useEffect(() => {
     	let final = [...props.newTweet].concat(tweetsInit);
     	if (final.length !== tweets.length) {
@@ -40,13 +44,16 @@ export function TweetsList(props) {
 	const newTweet = props.newTweet;
 	console.log(newTweet);
     useEffect(() => {
-        const myCallback = (response, status) => {
-            if (status === 200) {
-                setTweetsInit(response);
-            }
-        };
-        loadTweets(myCallback);
-    }, []);
+    	if (tweetsDidSet === false) {
+		    const myCallback = (response, status) => {
+			    if (status === 200) {
+				    setTweetsInit(response);
+				    setTweetsDidSet(true);
+			    }
+		    };
+		    loadTweets(myCallback);
+	    }
+    }, [tweetsInit, tweetsDidSet, setTweetsDidSet]);
     return tweets.map((item,index)=>{
                         return <Tweet tweet={item} className='my-5 py-5 border bg-white text-dark' key={`${index}-{item.id}`}/>
                     });
@@ -56,7 +63,7 @@ export function Tweet(props) {
     const {tweet} = props;
     const className = props.className ? props.className : 'col-10 mx-auto col-md-6';
     return <div className={className}>
-        <p>{tweet.id} - {tweet.content} - {tweet.likes}</p>
+        <p>{tweet.id} - {tweet.content}</p>
         <div>
             <ActionBtn tweet={tweet} action={{type:"like", display:"Like"}}/>
             <ActionBtn tweet={tweet} action={{type:"unlike", display:"Unlike"}}/>

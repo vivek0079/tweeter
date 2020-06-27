@@ -20,8 +20,6 @@ def home_view(request, *args, **kwargs):
 
 
 @api_view(['POST'])
-@authentication_classes([SessionAuthentication])
-@permission_classes([IsAuthenticated])
 def tweet_create_view(request, *args, **kwargs):
     serializer = TweetCreateSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
