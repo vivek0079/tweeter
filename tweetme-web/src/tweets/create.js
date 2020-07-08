@@ -5,12 +5,12 @@ export function TweetCreate(props) {
 	const textAreaRef = React.createRef();
 	const {didTweet} = props;
 	const handleBackendUpdate = (response, status) => {
-			if (status === 201) {
-				didTweet(response);
-			} else {
-				console.log(response);
-			}
-		};
+		if (status === 201) {
+			didTweet(response);
+		} else {
+			console.log(response);
+		}
+	};
 	const handleSubmit = (event) => {
 		event.preventDefault();
 		const newValue = textAreaRef.current.value;

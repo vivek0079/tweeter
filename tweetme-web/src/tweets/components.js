@@ -3,19 +3,37 @@ import {TweetsList} from "./list";
 import {TweetCreate} from "./create";
 import {apiTweetDetail} from './lookup';
 import {Tweet} from './detail'
+import {TweetsFeedList} from './feed'
+
+export function FeedComponent(props) {
+	const canTweet = true; //props.canTweet === "false" ? false : true;
+	const [newTweets, setNewTweets] = useState([]);
+
+	function handleNewTweet(newTweet) {
+		console.log('newTweet', newTweet);
+		var currentTweetList = [...newTweets];
+		currentTweetList.unshift(newTweet);
+		setNewTweets(currentTweetList);
+	}
+
+	return <div className={props.className}>
+		{canTweet && <TweetCreate didTweet={handleNewTweet} className='col-md-12 mb-3'/>}
+		<TweetsFeedList newTweet={newTweets} {...props} />
+	</div>
+}
+
 
 export function TweetsComponent(props) {
-	const {username} = props;
 	const canTweet = props.canTweet !== "false";
-	const [newTweet, setNewTweet] = useState([]);
+	const [newTweets, setNewTweets] = useState([]);
 	const handleNewTweet = (newTweet) => {
-		let currentTweetList = [...newTweet];
+		let currentTweetList = [...newTweets];
 		currentTweetList.unshift(newTweet);
-		setNewTweet(currentTweetList);
+		setNewTweets(currentTweetList);
 		};
 	return <div className={props.className}>
 		{canTweet && <TweetCreate didTweet={handleNewTweet} className='col-md-12 mb-3' />}
-		<TweetsList newTweet={newTweet} username={username}/>
+		<TweetsList newTweet={newTweets} {...props}/>
 	</div>
 }
 

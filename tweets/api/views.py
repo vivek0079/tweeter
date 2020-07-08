@@ -2,10 +2,9 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.http import is_safe_url
-
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -17,6 +16,7 @@ ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def tweet_create_view(request, *args, **kwargs):
     serializer = TweetCreateSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
@@ -27,9 +27,9 @@ def tweet_create_view(request, *args, **kwargs):
 
 def get_paginated_queryset_response(qs, request):
     paginator = PageNumberPagination()
-    paginator.page_size = 2
+    paginator.page_size = 10
     paginated_qs = paginator.paginate_queryset(qs, request)
-    serializer = TweetSerializer(paginated_qs, many=True)
+    serializer = TweetSerializer(paginated_qs, many=True, context={"request": request})
     return paginator.get_paginated_response(serializer.data)
 
 

@@ -5,7 +5,7 @@ ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 
 def home_view(request, *args, **kwargs):
-    return render(request=request, template_name="pages/home.html", context={}, status=200)
+    return render(request, template_name="pages/feed.html")
 
 
 def tweets_list_view(request, *args, **kwargs):
